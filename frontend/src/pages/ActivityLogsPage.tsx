@@ -4,9 +4,7 @@ import {
   Search, Calendar, Filter, Download, 
   Mail, MailOpen, MousePointerClick, UserPlus, Sparkles, AlertCircle, CheckCircle2, Server
 } from 'lucide-react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
+import Plot from 'react-plotly.js';
 
 // Mock Data for Charts
 const eventFrequencyData = [
@@ -193,19 +191,28 @@ export function ActivityLogsPage({ onNavigate }: ActivityLogsPageProps = {}) {
           <div className={`${theme.bgPanel} border ${theme.border} rounded-lg p-4 shadow-lg`}>
             <h3 className={`text-sm font-semibold mb-4 uppercase tracking-wider ${theme.textMuted}`}>Event Frequency (Last 24h)</h3>
             <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={eventFrequencyData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
-                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '6px', color: '#f8fafc' }}
-                    itemStyle={{ color: '#60a5fa' }}
-                    cursor={{fill: '#334155', opacity: 0.4}}
-                  />
-                  <Bar dataKey="events" fill="#3b82f6" radius={[2, 2, 0, 0]} maxBarSize={40} />
-                </BarChart>
-              </ResponsiveContainer>
+              <Plot
+                data={[
+                  {
+                    x: eventFrequencyData.map(d => d.time),
+                    y: eventFrequencyData.map(d => d.events),
+                    type: 'bar',
+                    marker: { color: '#3b82f6', line: { width: 0 } },
+                    hoverinfo: 'y+x'
+                  }
+                ]}
+                layout={{
+                  autosize: true,
+                  margin: { t: 10, r: 10, l: 30, b: 20 },
+                  paper_bgcolor: 'transparent',
+                  plot_bgcolor: 'transparent',
+                  xaxis: { showgrid: false, color: '#94a3b8', fixedrange: true },
+                  yaxis: { gridcolor: '#334155', gridwidth: 1, gridpattern: 'dash', color: '#94a3b8', fixedrange: true },
+                }}
+                config={{ displayModeBar: false, responsive: true }}
+                style={{ width: '100%', height: '100%' }}
+                useResizeHandler={true}
+              />
             </div>
           </div>
 

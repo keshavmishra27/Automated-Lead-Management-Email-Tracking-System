@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Sparkles, Activity, Mail, Inbox } from 'lucide-react';
+import { LayoutDashboard, Users, Sparkles, Activity, Mail } from 'lucide-react';
 
 interface SidebarProps {
   activeItem: string;
@@ -12,7 +12,6 @@ export function Sidebar({ activeItem, onNavigate }: SidebarProps) {
     { id: 'ai-insights', label: 'AI Insights', icon: Sparkles },
     { id: 'activity', label: 'Activity Logs', icon: Activity },
     { id: 'send-mail', label: 'Send Mail', icon: Mail },
-    { id: 'check-mail', label: 'Check Mail', icon: Inbox },
   ];
 
   return (

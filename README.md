@@ -48,9 +48,20 @@ flowchart TD
 | Layer | Technologies Used |
 | :--- | :--- |
 | **Frontend Framework** | React, TypeScript, Vite |
-| **Styling & UI** | Tailwind CSS, Lucide React (Icons) |
-| **Data Visualization** | Recharts (Area, Bar, Pie charts) |
-| **Architecture** | Component-based, React Hooks for state management |
+| **Styling & Animation** | Tailwind CSS, Lucide React, Framer Motion |
+| **Data Visualization** | Plotly.js |
+| **Backend API** | FastAPI, Python, Uvicorn |
+| **Email Integration** | Native SMTP library |
+
+##  API Endpoints
+
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/leads` | `GET` | Retrieve a list of all leads with their AI scores |
+| `/api/leads` | `POST` | Submit a new lead into the system |
+| `/api/mail/send` | `POST` | Send an email to a lead via SMTP |
+| `/api/mail/track` | `GET` | Webhook endpoint for tracking email opens |
+| `/api/mail/click` | `GET` | Webhook endpoint for tracking email link clicks |
 
 ##  Getting Started
 
@@ -83,7 +94,15 @@ Follow these instructions to get a copy of the project up and running on your lo
    npm run dev
    ```
 
-5. Open your browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`).
+5. **Start the backend server:**
+   Open a new terminal, navigate to the `backend` directory, and run:
+   ```bash
+   cd ../backend
+   pip install fastapi uvicorn pydantic
+   uvicorn main:app --reload
+   ```
+
+6. Open your browser and navigate to the local URL provided by Vite (usually `http://localhost:5173`).
 
 ##  Observability & Monitoring
 

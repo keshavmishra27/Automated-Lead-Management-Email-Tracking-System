@@ -5,10 +5,7 @@ import {
   Users, Mail, MailOpen, MousePointerClick, TrendingUp, BarChart3, 
   ArrowRight, ShieldAlert, Sparkles, Filter 
 } from 'lucide-react';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, LineChart, Line, Legend
-} from 'recharts';
+import Plot from 'react-plotly.js';
 
 // Mock Data
 const metricsData = [
@@ -93,23 +90,32 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
               <h3 className="text-lg font-semibold mb-6">Leads Acquisition</h3>
               <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={leadsOverTimeData}>
-                    <defs>
-                      <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dx={-10} />
-                    <Tooltip 
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Area type="monotone" dataKey="leads" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorLeads)" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <Plot
+                  data={[
+                    {
+                      x: leadsOverTimeData.map(d => d.name),
+                      y: leadsOverTimeData.map(d => d.leads),
+                      type: 'scatter',
+                      mode: 'lines',
+                      fill: 'tozeroy',
+                      fillcolor: 'rgba(59, 130, 246, 0.2)',
+                      line: { color: '#3b82f6', width: 3 },
+                      name: 'Leads',
+                      hoverinfo: 'y+name'
+                    }
+                  ]}
+                  layout={{
+                    autosize: true,
+                    margin: { t: 10, r: 10, l: 40, b: 30 },
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    xaxis: { showgrid: false, color: '#64748b', fixedrange: true },
+                    yaxis: { gridcolor: '#e2e8f0', gridwidth: 1, gridpattern: 'dash', color: '#64748b', fixedrange: true }
+                  }}
+                  config={{ displayModeBar: false, responsive: true }}
+                  style={{ width: '100%', height: '100%' }}
+                  useResizeHandler={true}
+                />
               </div>
             </div>
 
@@ -117,17 +123,39 @@ export function DashboardPage({ onNavigate }: DashboardPageProps = {}) {
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
               <h3 className="text-lg font-semibold mb-6">Email Performance</h3>
               <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={emailTrendData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b'}} dx={-10} />
-                    <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                    <Bar dataKey="sent" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="opened" fill="#10b981" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <Plot
+                  data={[
+                    {
+                      x: emailTrendData.map(d => d.name),
+                      y: emailTrendData.map(d => d.sent),
+                      type: 'bar',
+                      name: 'Sent',
+                      marker: { color: '#94a3b8' },
+                      hoverinfo: 'y+name'
+                    },
+                    {
+                      x: emailTrendData.map(d => d.name),
+                      y: emailTrendData.map(d => d.opened),
+                      type: 'bar',
+                      name: 'Opened',
+                      marker: { color: '#10b981' },
+                      hoverinfo: 'y+name'
+                    }
+                  ]}
+                  layout={{
+                    barmode: 'group',
+                    autosize: true,
+                    margin: { t: 10, r: 10, l: 40, b: 40 },
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    xaxis: { showgrid: false, color: '#64748b', fixedrange: true },
+                    yaxis: { gridcolor: '#e2e8f0', gridwidth: 1, gridpattern: 'dash', color: '#64748b', fixedrange: true },
+                    legend: { orientation: 'h', y: -0.15, x: 0.5, xanchor: 'center', font: { color: '#64748b' } }
+                  }}
+                  config={{ displayModeBar: false, responsive: true }}
+                  style={{ width: '100%', height: '100%' }}
+                  useResizeHandler={true}
+                />
               </div>
             </div>
           </div>

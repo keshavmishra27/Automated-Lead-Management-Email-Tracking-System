@@ -8,7 +8,7 @@ export const Navbar = ({ onNavigate }: NavbarProps = {}) => {
     <nav className="h-[64px] bg-canvas border-b border-hairline px-lg flex items-center justify-between sticky top-0 z-50">
       <div 
         className="text-[18px] font-bold tracking-[1.4px] uppercase flex items-center gap-xxs cursor-pointer"
-        onClick={() => onNavigate?.('capture')}
+        onClick={() => onNavigate?.('home')}
       >
         <span className="text-primary">LEADFLOW</span> AI
       </div>

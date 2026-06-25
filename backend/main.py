@@ -6,21 +6,24 @@ from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
 import re
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq
+
+# Use absolute path for .env relative to this script
+BASE_DIR = Path(__file__).resolve().parent.parent
+DOTENV_PATH = BASE_DIR / ".env"
+
 import smtplib
-import imaplib
-import email
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from email.header import decode_header
 from typing import List
 
-load_dotenv(dotenv_path="../.env") # Load from root
+load_dotenv(dotenv_path=DOTENV_PATH) # Load from root
 GROK_API_KEY = os.getenv("GROK_API_KEY")
 
 def get_mail_credentials():
-    load_dotenv(dotenv_path="../.env", override=True)
+    load_dotenv(dotenv_path=DOTENV_PATH, override=True)
     return os.getenv("MAIL"), os.getenv("APP_PASSWORD")
 
 
@@ -73,12 +76,6 @@ class EmailSendRequest(BaseModel):
     subject: str
     body: str
 
-class EmailMessageItem(BaseModel):
-    id: str
-    subject: str
-    sender: str
-    date: str
-    snippet: str
 
 # --- FastAPI App ---
 app = FastAPI(title="LeadFlow AI Backend")
@@ -177,67 +174,3 @@ def decode_mime_words(s):
         else:
             res += text
     return res
-
-@app.get("/api/mail/inbox", response_model=List[EmailMessageItem])
-def get_inbox(limit: int = 10):
-    mail_account, app_password = get_mail_credentials()
-    if not mail_account or not app_password:
-        raise HTTPException(status_code=500, detail="Mail credentials not configured")
-        
-    try:
-        # Connect to Gmail IMAP
-        mail = imaplib.IMAP4_SSL('imap.gmail.com')
-        mail.login(mail_account, app_password)
-        mail.select('inbox')
-        
-        status, messages = mail.search(None, 'ALL')
-        if status != "OK":
-            raise Exception("Failed to search inbox")
-            
-        email_ids = messages[0].split()
-        
-        # Get latest `limit` emails
-        latest_email_ids = email_ids[-limit:]
-        latest_email_ids.reverse() # Newest first
-        
-        inbox_emails = []
-        for e_id in latest_email_ids:
-            res, msg_data = mail.fetch(e_id, '(RFC822)')
-            if res != "OK":
-                continue
-                
-            for response_part in msg_data:
-                if isinstance(response_part, tuple):
-                    msg = email.message_from_bytes(response_part[1])
-                    subject = decode_mime_words(msg['Subject'])
-                    sender = decode_mime_words(msg.get('From', "Unknown"))
-                    date = msg.get('Date', "")
-                    
-                    # Get snippet
-                    snippet = ""
-                    if msg.is_multipart():
-                        for part in msg.walk():
-                            if part.get_content_type() == "text/plain":
-                                try:
-                                    snippet = part.get_payload(decode=True).decode()[:100]
-                                    break
-                                except:
-                                    pass
-                    else:
-                        try:
-                            snippet = msg.get_payload(decode=True).decode()[:100]
-                        except:
-                            pass
-                            
-                    inbox_emails.append(EmailMessageItem(
-                        id=e_id.decode('utf-8'),
-                        subject=subject,
-                        sender=sender,
-                        date=date,
-                        snippet=snippet.strip() + "..." if snippet else ""
-                    ))
-        
-        mail.logout()
-        return inbox_emails
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch inbox: {str(e)}")
